@@ -1,11 +1,14 @@
+import 'package:building_block/network_get_http_class.dart';
 import 'package:flutter/material.dart';
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class THisApp extends StatelessWidget {
+  const THisApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-    home: GetNetwork(),
+      debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
+      home: GetNetwork(),
     );
   }
 }
@@ -18,21 +21,41 @@ class GetNetwork extends StatefulWidget {
 }
 
 class _GetNetworkState extends State<GetNetwork> {
+  late Future<Album> futureAlbum;
+
+  @override
+  void initState() {
+    super.initState();
+    futureAlbum = fetchAlbum();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+      backgroundColor: Colors.blue,
         title: const Text(
-          'network data',
-          style: TextStyle(color: Colors.amber),
+          'N E T W O R K  D A T A',
+          style: TextStyle(color: Color.fromARGB(60, 255, 255, 255),
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(20),
-        itemCount: 4,
-        itemBuilder: (context, index) {
-          return Image.network('https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ableroof.com%2Fblog%2Favoid-window-gimmicks%2F&psig=AOvVaw1wFAaozPhrpyK8ZUwCe_I4&ust=1704537138930000&source=images&cd=vfe&opi=89978449&ved=0CBMQjRxqFwoTCMDtofCFxoMDFQAAAAAdAAAAABAD');
-        },
+      body: Center(
+        child: FutureBuilder<Album>(
+          future: futureAlbum,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+        return Text(snapshot.data!.title.toUpperCase());
+            } else if (snapshot.hasError) {
+        return Text('${snapshot.error}');
+            }
+        
+            // By default, show a loading spinner.
+            return const CircularProgressIndicator();
+          },
+        ),
       ),
     );
   }

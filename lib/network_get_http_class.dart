@@ -1,5 +1,21 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+Future<Album> fetchAlbum() async {
+  final response = await http
+      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+
+  if (response.statusCode == 200) {
+    // If the server did return a 200 OK response,
+    // then parse the JSON.
+    return Album.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+  } else {
+    // If the server did not return a 200 OK response,
+    // then throw an exception.
+    throw Exception('Failed to load album');
+  }
+}
 
 class Album {
   final int userId;
@@ -24,39 +40,19 @@ class Album {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'userId': userId,
-      'id': id,
-      'title': title,
+  factory Album.fromJson(Map<String, dynamic> json) {
+    return switch (json) {
+      {
+        'userId': int userId,
+        'id': int id,
+        'title': String title,
+      } =>
+        Album(
+          userId: userId,
+          id: id,
+          title: title,
+        ),
+      _ => throw const FormatException('Failed to load album.'),
     };
   }
-
-  factory Album.fromMap(Map<String, dynamic> map) {
-    return Album(
-      userId: map['userId'] as int,
-      id: map['id'] as int,
-      title: map['title'] as String,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory Album.fromJson(String source) => Album.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() => 'Album(userId: $userId, id: $id, title: $title)';
-
-  @override
-  bool operator ==(covariant Album other) {
-    if (identical(this, other)) return true;
-  
-    return 
-      other.userId == userId &&
-      other.id == id &&
-      other.title == title;
-  }
-
-  @override
-  int get hashCode => userId.hashCode ^ id.hashCode ^ title.hashCode;
 }
