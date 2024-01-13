@@ -32,6 +32,7 @@ Future<Album> createAlbum(String title) async {
     },
     body: jsonEncode(<String, String>{
       'title': title,
+      
     }),
       );
 
